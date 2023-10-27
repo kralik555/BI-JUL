@@ -14,7 +14,22 @@ function maxeig(
     norm_epsilon::T = epsilon * length(A),
     max_iter::Integer = 1_000
 ) where { T <: AbstractFloat }
-    # FIXME!
+	size(A, 1) == size(A, 2) || throw(ArgumentError("Not a square matrix"))
+	(epsilon >= 0 && norm_epsilon >= 0 && max_iter >= 0) || throw(ArgumentError("Arguments must be positive"))
+	max_iter > 0 || throw(ErrorException("Zero iterations are not enough"))
+	x_k = rand(Complex{T}, size(A, 1))
+	lambda_old = nothing
+	for i in 1:max_iter
+		Ax = A * x_k
+		x_k1 = Ax / norm(Ax)
+		lambda_new = dot(conj(x_k1), A * x_k1) / dot(conj(x_k1), x_k1)
+		lambda_old !== nothing && abs(lambda_new - lambda_old) < epsilon && 
+			norm(A * x_k - lambda_old * x_k) < norm_epsilon && return lambda_new, x_k1
+		lambda_old = lambda_new
+		x_k = x_k1
+	end
+	#return conj(lambda_old), x_k
+	throw(ErrorException("Not enough iterations to find the solution"))
 end
 
 maxeig(
@@ -38,7 +53,23 @@ function mineig(
     norm_epsilon::T = epsilon * length(A),
     max_iter::Integer = 1_000
 ) where { T <: AbstractFloat }
-    # FIXME!
+	size(A, 1) == size(A, 2) || throw(ArgumentError("Not a square matrix!"))
+	(epsilon >= 0 && norm_epsilon >= 0 && max_iter >= 0) || throw(ArgumentError("Arguments must be positive"))
+	max_iter > 0 || throw(ErrorException("Zero iterations are not enough"))
+	det(A - mu * I) == 0 && throw(ArgumentError("SingularMatrix"))
+	x_k = rand(Complex{T}, size(A, 1))
+	lambda_old = nothing
+	for i in 1:max_iter
+		A_inv = inv(A - mu * I)
+		Ax = A_inv * x_k
+		x_k1 = Ax / norm(Ax)
+		#lambda_new = dot(conj(x_k1), A * x_k1) / dot(conj(x_k1), x_k1)
+		lambda_new = dot(conj(x_k1), A_inv * x_k1) / dot(conj(x_k1), x_k1)
+		lambda_old !== nothing && abs(lambda_new - lambda_old) < epsilon && norm(A_inv * x_k - lambda_old * x_k) < norm_epsilon && return lambda_new, x_k1
+		lambda_old = lambda_new
+		x_k = x_k1
+	end
+	throw(ErrorException("Not enough iterations to find the solution"))
 end
 
 mineig(
