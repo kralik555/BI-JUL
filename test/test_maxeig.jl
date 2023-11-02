@@ -113,3 +113,9 @@ end
 
     @test λ ≈ 50 atol=100EPS
 end
+
+@testset "$(rpad("An example with nontrivial complex eigenvalue and complex eigenvectors.", TITLE_WIDTH))" begin
+    A = [0.5+1.0im -1.0-0.5im; 1.0+0.5im 0.5+1.0im]
+    λ, x = maxeig(A)
+    @test λ ≈ 2im
+end
