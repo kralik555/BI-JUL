@@ -22,7 +22,7 @@ function maxeig(
 	for i in 1:max_iter
 		Ax = A * x_k
 		x_k1 = Ax / norm(Ax)
-		lambda_new = dot(conj(x_k1), A * x_k1) / dot(conj(x_k1), x_k1)
+		lambda_new = dot(x_k1, A * x_k1) / dot(x_k1, x_k1)
 		
 		lambda_old !== nothing && abs(lambda_new - lambda_old) < epsilon && 
 			norm(A * x_k - lambda_old * x_k) < norm_epsilon && return lambda_new, x_k1
@@ -60,10 +60,11 @@ function mineig(
 	
 	x_k = rand(Complex{T}, size(A, 1))
 	lambda_old = nothing
+	A_inv = inv(A - mu * I)
 	for i in 1:max_iter
-		Ax = inv(A - mu * I) * x_k
+		Ax = A_inv * x_k
 		x_k1 = Ax / norm(Ax)
-		lambda_new = dot(conj(x_k1), A * x_k1) / dot(conj(x_k1), x_k1)
+		lambda_new = dot(x_k1, A * x_k1) / dot(x_k1, x_k1)
 		
 		lambda_old !== nothing && abs(lambda_new - lambda_old) < epsilon && norm(A * x_k - lambda_old * x_k) < norm_epsilon && return lambda_new, x_k1
 		lambda_old = lambda_new
