@@ -60,8 +60,10 @@ function mineig(
 	
 	x_k = rand(Complex{T}, size(A, 1))
 	lambda_old = nothing
+	A_moved = A - mu * I
+	A_moved = lu(A_moved)
 	for i in 1:max_iter
-		Ax = (A - mu * I) \ x_k
+		Ax = A_moved \ x_k
 		x_k1 = Ax / norm(Ax)
 		lambda_new = dot(x_k1, A * x_k1) / dot(x_k1, x_k1)
 		
